@@ -45,21 +45,34 @@ func GetStats(urls []string, origin time.Time, timeframe int64) map[string]Websi
 			//For successes - sum of response time, sumtofirstbyte
 			if line.Success {
 				//increase successcount
+				successCount++
 
 				//condition for higher loadtime
+				if line.LoadTime > maxResponseTime {
+					maxResponseTime = line.LoadTime
+				}
 
 				//condition for timetofirstbyte being greater than maxtimeforfirstbyte
+				if line.TTFB > maxTimeToFirstByte {
+					maxTimeToFirstByte = line.TTFB
+				}
 
 				//add all loadtimes
+				sumResponseTime += int64(line.LoadTime)
+
 				//add all timetofirstbyte
+				sumTimeToFirstByte += int64(line.TTFB)
 			}
 		}
 		if successCount > 0 {
 			//what is avgresponse time
+			avgResponseTime = float64(sumResponseTime) / float64(successCount)
 
 			//what is avg time to first byte
+			avgTimeToFirstByte = float64(sumTimeToFirstByte) / float64(successCount)
 
 			//what is the availability ---? How to calculate this = success over numrecords?
+			availability = successCount / float64(len(v))
 		}
 
 		//Website stats
@@ -96,7 +109,8 @@ func GetAvailabilityForRecords(records []request.ResponseLog, origin time.Time) 
 
 	//When successcount is greater than 0? Calculate availability - what is it? success/number of records? Like getstats?
 	if successCount > 0 {
-
+		availability = successCount / float64(len(records))
+		start = records[0].Timestamp
 	}
 
 	//return struct

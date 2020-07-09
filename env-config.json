@@ -22,6 +22,16 @@
     "availabilityInterval": 120,
     "availabilityThreshold": 0.8,
     "checkInterval": 5
-  }
+  },
+  "dashboard": [
+    {
+      "updateInterval": 10,
+      "timeFrame": 60
+    },
+    {
+      "updateInterval": 60,
+      "timeFrame": 3600
+    }
+  ]
 }
   

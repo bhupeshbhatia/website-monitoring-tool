@@ -144,7 +144,19 @@ func (influxDb InfluxDb) GetRecordsForURL(url string, origin time.Time, timefram
 	//Need to use standard duration parser - to parse timestamp from response from DB
 	//use NewStr2DurationParser to convert response time and time to first byte
 	for _, result := range res {
-		fmt.Println(result)
+		if len(result.Series) == 0 {
+			continue
+		}
+		for _, val := range result.Series[0].Values {
+			timestamp, _ := time.Parse(layout, val[0].(string))
+			statusCode, _ := val[1].(string)
+			success := val[2].(bool)
+			url := val[3].(string)
+			responseTime, _ := s2dParser.Str2Duration(val[4].(string))
+			timeToFirstByte, _ := s2dParser.Str2Duration(val[5].(string))
+			item := request.ResponseLog{Timestamp: timestamp, StatusCode: statusCode, URL: url, TTFB: timeToFirstByte, LoadTime: responseTime, Success: success}
+			records = append(records, item)
+		}
 	}
 	return records
 }

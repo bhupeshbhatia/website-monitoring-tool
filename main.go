@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/bhupeshbhatia/website-monitoring-tool/alerting"
+	"github.com/bhupeshbhatia/website-monitoring-tool/dashboard"
 	"github.com/bhupeshbhatia/website-monitoring-tool/database"
 	"github.com/bhupeshbhatia/website-monitoring-tool/monitor"
 	"github.com/bhupeshbhatia/website-monitoring-tool/request"
@@ -16,9 +17,10 @@ import (
 
 // Config struct containing websites config(url, check interval), database data(host, dbaname, username, password)
 type Config struct {
-	Websites []monitor.Site       `json:"websites"`
-	Database database.Type        `json:"database"`
-	Alert    alerting.AlertConfig `json:"alerting"`
+	Websites  []monitor.Site       `json:"websites"`
+	Database  database.Type        `json:"database"`
+	Alert     alerting.AlertConfig `json:"alerting"`
+	Dashboard []dashboard.View     `json:"dashboard"`
 }
 
 func getConfig() (Config, error) {
@@ -80,7 +82,7 @@ func main() {
 	defer close(alertc)
 
 	//Call the goroutines
-	//go dashboard
+	go dashboard.Run(websiteList, config.Dashboard, alertc, done)
 	go alerting.Run(alertc, websiteMap, config.Alert)
 
 	g.Go(func() error {
